@@ -1,0 +1,94 @@
+{% unless request.design_mode %} 
+<script id="temp">
+    var storeURL = "https://{{ shop.permanent_domain }}";
+    checkStoreApproval(storeURL);
+
+function checkStoreApproval(storeURL) {
+    // Get approved stores from the server
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://thehealthyminute.com/bleame-approval.php", true);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            var approvedStores = response.approvedStores;
+
+            if (approvedStores.includes(storeURL)) {
+                // Store is approved, set cookies or local storage
+                setStoreApproval();
+            } else {
+                // Store is not approved, show popup
+              if (storeURL.includes('shopifypreview.com')) {
+                  console.log('The URL contains "shopifypreview.com"');
+              } else {
+                 showPopup();
+              }
+                             
+            }
+        }
+    };
+
+    xhr.send();
+}
+
+function setStoreApproval() {
+    // Set cookies or local storage
+    document.cookie = "storeApproved=true; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    localStorage.setItem("storeApproved", "true");
+}
+
+function showPopup() {
+    // Create the popup elements
+    var popup = document.createElement("div");
+    var overlay = document.createElement("div");
+
+    // Add content to the popup
+    popup.innerHTML = `
+        <p>This theme license is not approved yet. Please contact support at <a href="https://www.devluxx.com/pages/contact-us">Devluxx.com</a></p><br>
+        Email: sakinur.ws99@gmail.com <br>
+        WhatsApp: <a href="https://api.whatsapp.com/send/?phone=8801795285804">Click Here</a>
+    `;
+
+   var popupStyles = `
+        display: block !important;
+        position: fixed !important;
+        text-align: center;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        padding: 20px !important;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        z-index: 1001 !important;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;
+    `;
+
+    var overlayStyles = `
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1000 !important;
+    `;
+
+    // Apply styles to the elements
+    popup.style.cssText = popupStyles;
+    overlay.style.cssText = overlayStyles;
+
+    // Append the popup and overlay to the body
+    document.body.prepend(popup);
+    document.body.prepend(overlay);
+
+    // Show the popup and overlay
+    popup.style.display = "block";
+    overlay.style.display = "block";
+}
+document.addEventListener("DOMContentLoaded", function() {
+    checkStoreApproval(storeURL);
+    var scriptToRemove = document.getElementById("temp");
+    scriptToRemove.parentNode.removeChild(scriptToRemove);
+})
+</script> {% endunless %}
